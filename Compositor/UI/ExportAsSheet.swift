@@ -91,7 +91,7 @@ struct ExportAsSheet: View {
             }
             .padding(.bottom, -8)
             ZStack {
-                Color(white: 0.12)
+                Color(nsColor: .themed(dark: 0.12, light: 0.94))
                 if let result {
                     JPEGPreview(image: result.preview, pixelWidth: result.settings.width, pixelHeight: result.settings.height, zoom: $zoom)
                 }

@@ -40,8 +40,9 @@ final class CompositorApplicationDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         // AppKit's own switches for two of the Edit menu's text extras (see `removeSystemExtras`).
         UserDefaults.standard.register(defaults: ["NSDisabledDictationMenuItem": true, "NSDisabledCharacterPaletteMenuItem": true])
-        // Always dark, alerts and open/save panels included, whatever the Mac is set to.
-        NSApp.appearance = NSAppearance(named: .darkAqua)
+        // The Appearance submenu's stored choice (dark unless changed), alerts and
+        // open/save panels included.
+        AppearanceMode.applyStored()
         // Slider knobs snap to a click on the track instead of gliding there.
         SliderSnap.install()
     }

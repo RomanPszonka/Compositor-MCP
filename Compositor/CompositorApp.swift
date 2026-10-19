@@ -6,6 +6,7 @@ import Sparkle
 struct CompositorApp: App {
     @NSApplicationDelegateAdaptor(CompositorApplicationDelegate.self) private var applicationDelegate
     @AppStorage("navigator.visible") private var showsNavigator = false
+    @AppStorage("appearance") private var appearanceMode = AppearanceMode.dark.rawValue
     private var session: EditorSession { applicationDelegate.session }
     var body: some Scene {
         Window("Compositor", id: "editor") {
@@ -134,6 +135,16 @@ struct CompositorApp: App {
                         Toggle("Navigator (300% and above)", isOn: $showsNavigator)
                         Toggle("Pixel Grid (800% and above)", isOn: Binding(get: { session.showsPixelGrid },
                                                                               set: { session.showsPixelGrid = $0 }))
+                        // Dark is the default, as the app has always looked; System follows the Mac's own setting.
+                        Menu("Appearance") {
+                            Picker("Appearance", selection: $appearanceMode) {
+                                ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
+                                    Text(mode.rawValue).tag(mode.rawValue)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                            .labelsHidden()
+                        }
                         Toggle("Show Transform Controls", isOn: Binding(get: { session.showsTransformControls },
                                                                           set: { session.showsTransformControls = $0 }))
                             .configuredKeyboardShortcut("h").disabled(session.tool != .move || session.document == nil)

@@ -862,8 +862,9 @@ final class CanvasView: NSView {
         }
     }
 
-    /// The gray around the canvas, black in Canvas Only (F).
-    private var surround: CGFloat { session.canvasOnly ? 0 : 0.105 }
+    /// The canvas surround: near-black in dark, near-paper in light. Canvas Only (F) closes it to
+    /// pure black (dark) or pure paper (light) so the document sits on an unbroken field.
+    private var surround: CGFloat { AppearanceMode.isDark ? (session.canvasOnly ? 0 : 0.105) : 0.86 }
 
     override func draw(_ dirtyRect: NSRect) {
         // The grid and a text frame being dragged follow the pixels under them.
@@ -916,7 +917,8 @@ final class CanvasView: NSView {
             context.endTransparencyLayer()
         }
         context.restoreGState()
-        context.setStrokeColor(NSColor.white.withAlphaComponent(0.13).cgColor)
+        // The document's edge hairline: a faint light line in dark mode, a faint dark one in light.
+        context.setStrokeColor(NSColor.themed(dark: 1, light: 0, alpha: 0.13).cgColor)
         context.setLineWidth(1 / session.viewport.backingScale)
         context.stroke(rect)
     }
@@ -2772,7 +2774,7 @@ extension CanvasView {
         }
         frame = picture.composited(over: frame)
         // The document's edge: a one-pixel line centered on it.
-        let edge = gray(1, alpha: 0.13)
+        let edge = gray(AppearanceMode.isDark ? 1 : 0, alpha: 0.13)
         for line in [CGRect(x: rect.minX - 0.5, y: rect.minY - 0.5, width: rect.width + 1, height: 1),
                      CGRect(x: rect.minX - 0.5, y: rect.maxY - 0.5, width: rect.width + 1, height: 1),
                      CGRect(x: rect.minX - 0.5, y: rect.minY + 0.5, width: 1, height: rect.height - 1),

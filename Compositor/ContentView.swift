@@ -2,6 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
+    @AppStorage("appearance") private var appearanceMode = AppearanceMode.dark.rawValue
     /// The Layers panel's width, remembered across launches.
     @AppStorage("layersPanelWidth") private var layersPanelWidth = 252.0
     @AppStorage("navigator.visible") private var showsNavigator = false
@@ -138,7 +139,7 @@ struct ContentView: View {
     // Split again for 1.1: the chain outgrew the type checker once more.
     @ViewBuilder private var editorChrome: some View {
         editorStack
-        .background(Color(white: 0.14))
+        .background(Color(nsColor: .themed(dark: 0.14, light: 0.92)))
         .background {
             if let applicationDelegate, applicationDelegate.projects.workspace == nil {
                 ProjectWindowBridge(controller: applicationDelegate.projects).frame(width: 0, height: 0)
@@ -172,7 +173,9 @@ struct ContentView: View {
             }
         }
         .onAppear { applicationDelegate?.showEditor = { openWindow(id: "editor") } }
-        .preferredColorScheme(.dark)
+        // The Appearance submenu's choice for SwiftUI content; AppKit reads NSApp.appearance.
+        .preferredColorScheme(AppearanceMode.current.colorScheme)
+        .onChange(of: appearanceMode) { AppearanceMode.applyStored() }
         // Canvas Only (F): the canvas runs up under where the title bar was, so no gray strip is left across the top.
         // The toolbar itself is hidden and shown by the window (see `toggleCanvasOnly`), which lays its buttons out
         // again properly; hidden here instead, it came back with the tabs over the window buttons.
