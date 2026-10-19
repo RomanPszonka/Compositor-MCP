@@ -682,6 +682,12 @@ final class CanvasView: NSView {
         brushCursor.frame = bounds
         syncGeometry()
     }
+    /// The surround and the document's edge hairline are drawn, not dynamic: repaint on any appearance
+    /// change, the Appearance submenu's or the Mac's own (System mode) alike.
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         syncGeometry()

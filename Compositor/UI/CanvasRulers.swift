@@ -8,7 +8,7 @@ enum CanvasRuler {
 struct CanvasRulerCorner: View {
     var body: some View {
         Rectangle()
-            .fill(Color(white: 0.2))
+            .fill(Color(nsColor: .themed(dark: 0.2, light: 0.92)))
             .overlay(alignment: .bottomTrailing) {
                 Path { path in
                     path.move(to: CGPoint(x: 5, y: CanvasRuler.thickness - 4))
@@ -55,8 +55,14 @@ final class CanvasRulerNSView: NSView {
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { true }
 
+    /// Tick and label colors are drawn, not dynamic: repaint on any appearance change.
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+
     override func draw(_ dirtyRect: NSRect) {
-        NSColor(white: 0.2, alpha: 1).setFill()
+        NSColor.themed(dark: 0.2, light: 0.92).setFill()
         bounds.fill()
         guard let document = session.document else { return }
         let size = document.size
@@ -64,8 +70,8 @@ final class CanvasRulerNSView: NSView {
         let step = Self.majorStep(pointsPerPixel: scale)
         let minor = step / 10
         let hairline = 1 / max(window?.backingScaleFactor ?? 1, 1)
-        let tick = NSColor(white: 0.62, alpha: 1)
-        let labels = NSColor(white: 0.78, alpha: 1)
+        let tick = NSColor.themed(dark: 0.62, light: 0.42)
+        let labels = NSColor.themed(dark: 0.78, light: 0.25)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedDigitSystemFont(ofSize: 8, weight: .regular),
             .foregroundColor: labels
@@ -121,7 +127,7 @@ final class CanvasRulerNSView: NSView {
             }
             value += minor
         }
-        NSColor(white: 0.08, alpha: 1).setFill()
+        NSColor.themed(dark: 0.08, light: 0.8).setFill()
         if axis == .horizontal {
             NSRect(x: 0, y: bounds.height - hairline, width: bounds.width, height: hairline).fill()
         } else {
